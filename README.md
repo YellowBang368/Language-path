@@ -15,4 +15,4 @@
 
 
 
-![Image alt](https://github.com/YellowBang368/Language-path/raw/blob/master/False.png)
+![alt text](master/False.png)
