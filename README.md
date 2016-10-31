@@ -15,4 +15,4 @@
 
 
 
-Каким образом удалить весь заранее созданный контент в окне, когда метод "start" начинает работу сначала ??
+![Image alt](https://github.com/YellowBang368/Language-path/raw/master/origin/False.png)
