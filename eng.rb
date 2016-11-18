@@ -22,13 +22,46 @@ def gg
 	gg_page_again = TkButton.new($frame_gg) do
 		text "Again"
 		pack("side"=>"right", "padx"=> "50", "pady"=> "10")
-		pack("side"=>"right", "padx"=> "50", "pady"=> "10")
 		command (proc {start})
 	end
 	gg_page_exit = TkButton.new($frame_gg) do
-		text "exit"
+		text "Exit"
 		pack("side"=>"right", "padx"=> "50", "pady"=> "10")
-		command(proc {exit})
+		command (proc {exit})
+	end
+	gg_page_stats = TkButton.new($frame_gg) do
+		text "Stats"
+		pack("side"=>"right", "padx"=> "50", "pady"=> "10")
+		command (proc {stats})
+	end
+end
+def stats
+	$frame_gg.pack_forget
+	$frame_stats = TkFrame.new($main_menu) do
+		background "red"
+		padx 15
+		pady 20
+		pack('side' => 'left')
+	end
+	stats_page_lbl = TkLabel.new($frame_stats) do  
+		text "learned words: "
+	 	pack("side"=>"left", "padx"=> "0", "pady"=> "150")
+	end
+	stats_page_lbl2 = TkLabel.new($frame_stats) do  
+		text "1 — 2
+1 — 2
+1 — 2
+1 — 2
+1 — 2
+1 — 2
+1 — 2
+1 — 2"
+	 	pack("side"=>"left", "padx"=> "50", "pady"=> "150")
+	end
+	stats_page_exit = TkButton.new($frame_stats) do
+		text "Exit"
+		pack("side"=>"right", "padx"=> "0", "pady"=> "10")
+		command (proc {exit})
 	end
 end
 ########################
@@ -42,6 +75,7 @@ b = fields[1]
 $eng_hash[a] = b
 end
 
+black_list = File.open("black_list.txt", 'w')
 $keys = $eng_hash.each_key.to_a # Создаем массив из КЛЮЧЕЙ хеша $eng_hash
 $values = $eng_hash.each_value.to_a # Создаем массив из ЗНАЧЕНИЙ хеша $eng_hash
 
@@ -49,7 +83,7 @@ $main_menu = TkRoot.new do
 	title "Language-path(eng)"
 	minsize(400,400)
 end
-$frame_start = TkFrame.new($main_menu) {}
+$frame_start = TkFrame.new($main_menu) {}   # Нужен!
 
 $start_button = TkButton.new($main_menu) do
 	text "start"
@@ -57,6 +91,7 @@ $start_button = TkButton.new($main_menu) do
 	pack("side"=> "left", "padx"=> "30", "pady"=> "5")
 end
 
+$black_list = File.open("./black_list.txt", 'w', encoding: "utf-8")
 menu = TkMenu.new($main_menu) # создаём меню
 menu.add('command', 'label' => "English") #, 'command' => eng_click
 menu.add('command', 'label' => "Español")
@@ -68,28 +103,28 @@ $main_menu.menu(bar)
 def start
 	$start_button.pack_forget
 	$frame_start.pack_forget
-	key = $keys.sample # Рандомный item из массива $keys
-	# (ОЧЕНЬ ВАЖНО) Переменая key является тем самым словом, перевод которого бы будем выбирать в приложении
-	true_value = $eng_hash[key] # Правильный перевод
+	$key = $keys.sample # Рандомный item из массива $keys
+	# (ОЧЕНЬ ВАЖНО) Переменая $key является тем самым словом, перевод которого бы будем выбирать в приложении
+	$true_value = $eng_hash[$key] # Правильный перевод
 
-	wrong_value1 = $values.sample
-	while wrong_value1 == true_value do
-		wrong_value1 = $values.sample
+	$wrong_value1 = $values.sample
+	while $wrong_value1 == $true_value do
+		$wrong_value1 = $values.sample
 	end
-	wrong_value2 = $values.sample
-	while wrong_value2 == true_value do
-		wrong_value2 = $values.sample
+	$wrong_value2 = $values.sample
+	while $wrong_value2 == $true_value do
+		$wrong_value2 = $values.sample
 	end
-	while wrong_value2 == wrong_value1 do
-		wrong_value2 = $values.sample
+	while $wrong_value2 == $wrong_value1 do
+		$wrong_value2 = $values.sample
 	end
 
-	# key         	слово
-	# true_value	правильный перевод
-	# wrong_value1	неправильный перевод
-	# wrong_value2	неправильный перевод
+	# $key         	слово
+	# $true_value	правильный перевод
+	# $wrong_value1	неправильный перевод
+	# $wrong_value2	неправильный перевод
 	# Запишем все три варианта ответа в один массив
-	variables = [true_value, wrong_value1, wrong_value2]
+	variables = [$true_value, $wrong_value1, $wrong_value2]
 	v1 = variables.sample
 	v2 = variables.sample
 	while v2 == v1 do
@@ -100,13 +135,13 @@ def start
 		v3 = variables.sample
 	end
 
-	if v1 == true_value
+	if v1 == $true_value
 		puts "v1"
 	end
-	if v2 == true_value
+	if v2 == $true_value
 		puts "v2"
 	end
-	if v3 == true_value
+	if v3 == $true_value
 		puts "v3"
 	end
 
@@ -123,16 +158,17 @@ def start
 	end
 
 	$eng_page_key = TkButton.new($frame_start) do
-		text key
+		text $key
 		pack('padx'=>0	,'pady'=>30)
 	end
 
 	$value1 = TkButton.new($frame_start) do
 		text v1
-		if v1 == true_value
+		if v1 == $true_value
+			command ($black_list.puts $key)
 			command (proc {start})
 		end
-		if v1 == wrong_value1 or v1 == wrong_value2
+		if v1 == $wrong_value1 or v1 == $wrong_value2
 			command (proc {gg})
 		end
 	  	pack("side"=> "left", "padx"=> "30", "pady"=> "5")
@@ -140,10 +176,11 @@ def start
 
 	$value2 = TkButton.new($frame_start) do
 		text v2
-		if v2 == true_value
+		if v2 == $true_value
+			command ($black_list.puts $key)
 			command (proc {start})
 		end
-		if v2 == wrong_value1 or v2 == wrong_value2
+		if v2 == $wrong_value1 or v2 == $wrong_value2
 			command (proc {gg})
 		end
 	  	pack("side"=> "left", "padx"=> "30", "pady"=> "5")
@@ -151,17 +188,17 @@ def start
 
 	$value3 = TkButton.new($frame_start) do
 		text v3
-		if v3 == true_value
+		if v3 == $true_value
+			command ($black_list.puts $key)
 			command (proc {start})
 		end
-		if v3 == wrong_value1 or v3 == wrong_value2
+		if v3 == $wrong_value1 or v3 == $wrong_value2
 			command (proc {gg})
 		end
 	  	pack("side"=> "left", "padx"=> "30", "pady"=> "5")
 	end
-	
-end
 
+end
 
 
 Tk.mainloop
